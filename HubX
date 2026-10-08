@@ -1,0 +1,151 @@
+-- Создание главного GUI
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Title = Instance.new("TextLabel")
+local StatusLabel = Instance.new("TextLabel")
+local LoadingBarBg = Instance.new("Frame")
+local LoadingBarFill = Instance.new("Frame")
+local UICornerBarBg = Instance.new("UICorner")
+local UICornerBarFill = Instance.new("UICorner")
+
+-- Кнопка копирования
+local CopyButton = Instance.new("TextButton")
+local UICornerButton = Instance.new("UICorner")
+
+-- Кнопка закрытия (крестик)
+local CloseButton = Instance.new("TextButton")
+local UICornerClose = Instance.new("UICorner")
+
+-- Настройка ScreenGui
+ScreenGui.Name = "SpeedHubX_Notification"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Главное окно
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -90)
+MainFrame.Size = UDim2.new(0, 360, 0, 180)
+
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+-- Кнопка закрытия (крестик)
+CloseButton.Name = "CloseButton"
+CloseButton.Parent = MainFrame
+CloseButton.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+CloseButton.Position = UDim2.new(1, -35, 0, 12)
+CloseButton.Size = UDim2.new(0, 23, 0, 23)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(180, 180, 190)
+CloseButton.TextSize = 13
+CloseButton.AutoButtonColor = true
+
+UICornerClose.CornerRadius = UDim.new(0, 6)
+UICornerClose.Parent = CloseButton
+
+-- Заголовок
+Title.Name = "Title"
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 15)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "SpeedHubX"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 20
+
+-- Текст статуса
+StatusLabel.Name = "StatusLabel"
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 20, 0, 50)
+StatusLabel.Size = UDim2.new(1, -40, 0, 35)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.Text = "Инициализация и загрузка скрипта...\nПожалуйста, подождите."
+StatusLabel.TextColor3 = Color3.fromRGB(180, 180, 190)
+StatusLabel.TextSize = 13
+
+-- Шкала загрузки (фон)
+LoadingBarBg.Name = "LoadingBarBg"
+LoadingBarBg.Parent = MainFrame
+LoadingBarBg.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+LoadingBarBg.Position = UDim2.new(0, 30, 0, 105)
+LoadingBarBg.Size = UDim2.new(0, 300, 0, 8)
+
+UICornerBarBg.CornerRadius = UDim.new(1, 0)
+UICornerBarBg.Parent = LoadingBarBg
+
+-- Шкала загрузки (заполнение)
+LoadingBarFill.Name = "LoadingBarFill"
+LoadingBarFill.Parent = LoadingBarBg
+LoadingBarFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+LoadingBarFill.Size = UDim2.new(0, 0, 1, 0)
+
+UICornerBarFill.CornerRadius = UDim.new(1, 0)
+UICornerBarFill.Parent = LoadingBarFill
+
+-- Кнопка копирования (скрыта во время загрузки)
+CopyButton.Name = "CopyButton"
+CopyButton.Parent = MainFrame
+CopyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+CopyButton.Position = UDim2.new(0, 30, 0, 125)
+CopyButton.Size = UDim2.new(0, 300, 0, 35)
+CopyButton.Font = Enum.Font.GothamBold
+CopyButton.Text = "📋 Скопировать ссылку на бота"
+CopyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.TextSize = 13
+CopyButton.Visible = false
+CopyButton.AutoButtonColor = true
+
+UICornerButton.CornerRadius = UDim.new(0, 8)
+UICornerButton.Parent = CopyButton
+
+-- Анимация загрузки (10 секунд) и ошибки
+task.spawn(function()
+	local tweenService = game:GetService("TweenService")
+	local info = TweenInfo.new(10, Enum.EasingStyle.Linear)
+	
+	local tween = tweenService:Create(LoadingBarFill, info, {Size = UDim2.new(1, 0, 1, 0)})
+	tween:Play()
+	tween.Completed:Wait()
+	
+	-- Смена стиля на «ошибка»
+	LoadingBarFill.BackgroundColor3 = Color3.fromRGB(255, 75, 75)
+	LoadingBarBg.Visible = false 
+	Title.TextColor3 = Color3.fromRGB(255, 75, 75)
+	Title.Text = "Ошибка: Требуется покупка!"
+	StatusLabel.Text = "Для доступа к скрипту купите его в боте:\n@speedhubx_bot"
+	StatusLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
+	
+	-- Показываем интерактивную кнопку
+	CopyButton.Visible = true
+end)
+
+-- Обработка клика по кнопке копирования
+CopyButton.MouseButton1Click:Connect(function()
+	local success = pcall(function()
+		setclipboard("https://t.me/speedhubx_bot")
+	end)
+	
+	if success then
+		CopyButton.Text = "✅ Ссылка скопирована!"
+		CopyButton.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+		task.wait(2)
+		CopyButton.Text = "📋 Скопировать ссылку на бота"
+		CopyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+	else
+		CopyButton.Text = "❌ Ошибка копирования"
+		task.wait(2)
+		CopyButton.Text = "📋 Скопировать ссылку на бота"
+	end
+end)
+
+-- Обработка закрытия интерфейса
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
